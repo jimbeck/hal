@@ -29,7 +29,8 @@ export function parseHalTemplate(json: any) {
           field = z.boolean();
           break;
         case 'number':
-          field = z.coerce.number();
+          // treat empty string or null as undefined before coercion
+          field = z.preprocess((val) => (val === '' || val == null ? undefined : val), z.coerce.number());
           break;
         case 'date':
           field = z.string().refine(
@@ -42,7 +43,8 @@ export function parseHalTemplate(json: any) {
       }
     }
 
-    if (validations.required === false) {
+    // only enforce required when explicitly true
+    if (validations.required !== true) {
       field = field.optional();
     }
 

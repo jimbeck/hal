@@ -73,7 +73,11 @@ export default function HalformPage() {
     });
     const result = await res.json();
     toast.success('Form submitted successfully!', {
-      description: `Response: ${JSON.stringify(result)}`,
+      description: (
+      <pre style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }}>
+        {JSON.stringify(payload, null, 2)}
+      </pre>
+      ),
       duration: Infinity,
       position: 'top-center',
     });
