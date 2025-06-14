@@ -1,5 +1,5 @@
-import Form from "./_components/form";
+import DynamicForm from "./_components/dynamic-form";
 
 export default async function Home() {
-    return <Form/>;
+    return <DynamicForm/>;
 }

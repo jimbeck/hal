@@ -1,4 +1,3 @@
-// File: app/form/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -19,9 +18,10 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { parseHalTemplate } from '@/lib/hal-parser';
+import { buildPayload } from '@/lib/form-utils';
 
 
-export default function HalformPage() {
+export default function DynamicForm() {
   const [template, setTemplate] = useState<any | null>(null);
   const [schema, setSchema] = useState<z.ZodObject<any> | null>(null);
   const [target, setTarget] = useState<string>('');
@@ -41,37 +41,13 @@ export default function HalformPage() {
     fetchTemplate();
   }, []);
 
-  // helper: turn flat form values into nested object per `path`
-  function buildPayload(data: any, properties: any[]) {
-    const result: any = {};
-    properties.forEach((prop) => {
-      const value = data[prop.name];
-      if (prop.path) {
-        const keys = prop.path.split('.');
-        let curr = result;
-        keys.forEach((key: string, i: number) => {
-          if (i === keys.length - 1) {
-            curr[key] = value;
-          } else {
-            curr[key] = curr[key] || {};
-            curr = curr[key];
-          }
-        });
-      } else {
-        result[prop.name] = value;
-      }
-    });
-    return result;
-  }
-
   const onSubmit = async (data: any) => {
     const payload = buildPayload(data, template._templates.default.properties);
-    const res = await fetch(target, {
+    await fetch(target, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const result = await res.json();
     toast.success('Form submitted successfully!', {
       description: (
       <pre style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }}>
