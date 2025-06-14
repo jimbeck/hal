@@ -41,18 +41,43 @@ export default function HalformPage() {
     fetchTemplate();
   }, []);
 
+  // helper: turn flat form values into nested object per `path`
+  function buildPayload(data: any, properties: any[]) {
+    const result: any = {};
+    properties.forEach((prop) => {
+      const value = data[prop.name];
+      if (prop.path) {
+        const keys = prop.path.split('.');
+        let curr = result;
+        keys.forEach((key: string, i: number) => {
+          if (i === keys.length - 1) {
+            curr[key] = value;
+          } else {
+            curr[key] = curr[key] || {};
+            curr = curr[key];
+          }
+        });
+      } else {
+        result[prop.name] = value;
+      }
+    });
+    return result;
+  }
+
   const onSubmit = async (data: any) => {
+    const payload = buildPayload(data, template._templates.default.properties);
     const res = await fetch(target, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
     const result = await res.json();
-    toast.success(`Form submitted successfully!}`, {
+    toast.success('Form submitted successfully!', {
       description: `Response: ${JSON.stringify(result)}`,
       duration: Infinity,
       position: 'top-center',
-    }),
+    });
+    console.log(payload);
     reset();
   };
 
@@ -68,7 +93,10 @@ export default function HalformPage() {
             name={prop.name}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{prop.name} {prop.required ? '*' : '(optional)'}</FormLabel>
+                <FormLabel>
+                  {prop.label || prop.name}{' '}
+                  {prop.validations?.required ? '*' : '(optional)'}
+                </FormLabel>
                 <FormControl>
                   {prop.type === 'cv' && prop.accepted ? (
                     prop.multiple ? (

@@ -13,36 +13,55 @@ export async function GET() {
         target: '/api/halform',
         properties: [
           {
-            name: 'fullName',
+            name: 'firstName',
             type: 'string',
-            required: true,
+            label: 'First Name',
+            path: 'user.name.first',
+            validations: { required: true },
+          },
+          {
+            name: 'lastName',
+            type: 'string',
+            label: 'Last Name',
+            path: 'user.name.last',
+            validations: { required: true },
           },
           {
             name: 'emailAddress',
             type: 'string',
-            required: true,
-            regex: '^\\S+@\\S+\\.\\S+$',
-            message: 'Invalid email format',
+            label: 'Email Address',
+            path: 'user.email',
+            validations: {
+              required: true,
+              regex: '^\\S+@\\S+\\.\\S+$',
+              message: 'Invalid email format',
+            },
           },
           {
             name: 'age',
             type: 'number',
-            required: false,
+            label: 'Age',
+            path: 'user.age',
           },
           {
             name: 'subscribed',
             type: 'boolean',
-            required: false,
+            label: 'Subscribed to Newsletter',
+            path: 'user.preferences.subscribed',
           },
           {
             name: 'birthDate',
             type: 'date',
-            required: true,
+            label: 'Birth Date',
+            path: 'user.birthDate',
+            validations: { required: true },
           },
           {
             name: 'userType',
             type: 'cv',
-            required: true,
+            label: 'User Type',
+            path: 'user.role',
+            validations: { required: true },
             accepted: [
               { id: 'admin', name: 'Administrator' },
               { id: 'editor', name: 'Editor' },
@@ -52,8 +71,8 @@ export async function GET() {
           {
             name: 'interests',
             type: 'cv',
-            required: false,
-            multiple: true,
+            label: 'Interests',
+            path: 'user.preferences.interests',
             accepted: [
               { id: 'tech', name: 'Technology' },
               { id: 'sports', name: 'Sports' },
@@ -66,6 +85,7 @@ export async function GET() {
     },
   });
 }
+
 
 export async function POST(req: Request) {
   const data = await req.json();

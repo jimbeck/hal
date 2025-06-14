@@ -7,6 +7,7 @@ export function parseHalTemplate(json: any) {
   // build up a Zod “shape” for each property
   const shape: Record<string, z.ZodTypeAny> = {};
   for (const prop of json._templates.default.properties) {
+    const { validations = {} } = prop;
     let field: z.ZodTypeAny;
 
     if (prop.type === 'cv' && prop.accepted) {
@@ -17,10 +18,10 @@ export function parseHalTemplate(json: any) {
       switch (prop.type) {
         case 'string':
           field = z.string();
-          if (prop.regex) {
+          if (validations.regex) {
             field = (field as z.ZodString).regex(
-              new RegExp(prop.regex),
-              prop.message
+              new RegExp(validations.regex),
+              validations.message
             );
           }
           break;
@@ -41,7 +42,7 @@ export function parseHalTemplate(json: any) {
       }
     }
 
-    if (!prop.required) {
+    if (validations.required === false) {
       field = field.optional();
     }
 
